@@ -251,96 +251,249 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="main-header">
-        <div class="container-fluid">
-            <nav class="navbar navbar-expand-lg navbar-custom">
-                <div class="container-fluid">
-                    <a class="navbar-brand" href="/">
-                        <span class="brand-title">NewsPortal</span>
-                        <small class="text-muted d-block" style="font-size: 0.75rem;">Thông tin chính xác - Cập nhật liên tục</small>
-                    </a>
-                    
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-                        <i class="fas fa-bars"></i>
-                    </button>
-
-                    <div class="collapse navbar-collapse" id="navbarMain">
-                        <ul class="navbar-nav mx-auto">
-                            <!-- Trang chủ -->
-                            <li class="nav-item">
-                                <a class="nav-link-custom {{ Request::is('/') ? 'active' : '' }}" href="/">
-                                    <i class="fas fa-home me-1"></i> Trang chủ
-                                </a>
-                            </li>
-                            
-                            <!-- Các loại tin từ menu.blade.php -->
-                            <?php
-                            use Illuminate\Support\Facades\DB;
-                            $loaitin_arr = DB::table('loaitin')->select('id', 'ten')
-                                ->orderby('thuTu', 'asc')
-                                ->where('AnHien', '=', '1')
-                                ->limit(5)->get();
-                            ?>
-                            
-                            @foreach ($loaitin_arr as $lt)
-                            <li class="nav-item">
-                                <a class="nav-link-custom {{ Request::is('cat/'.$lt->id) ? 'active' : '' }}" 
-                                   href="{{ url('/cat',[$lt->id]) }}">
-                                    <i class="fas fa-folder me-1"></i> {{ $lt->ten }}
-                                </a>
-                            </li>    
-                            @endforeach
-                            
-                            <!-- Dropdown cho các danh mục khác -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link-custom dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-h me-1"></i> Khác
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow" style="border-radius: 12px; border: 1px solid #e5e7eb;">
-                                    <?php
-                                    $moreCategories = DB::table('loaitin')->select('id', 'ten')
-                                        ->orderby('thuTu', 'asc')
-                                        ->where('AnHien', '=', '1')
-                                        ->skip(5)->take(10)->get();
-                                    ?>
-                                    
-                                    @foreach($moreCategories as $cat)
-                                    <li>
-                                        <a class="dropdown-item py-2" href="{{ url('/cat',[$cat->id]) }}">
-                                            <i class="fas fa-angle-right me-2 text-primary"></i> {{ $cat->ten }}
-                                        </a>
-                                    </li>
-                                    @endforeach
-                                    
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item py-2" href="#">
-                                            <i class="fas fa-list me-2 text-primary"></i> Xem tất cả
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                        
-                        <!-- Phần tìm kiếm và Subscribe -->
-                        <div class="d-flex align-items-center">
-                            <div class="search-box me-3">
-                                <div class="input-group">
-                                    <input type="text" class="form-control search-input" placeholder="Tìm kiếm tin tức...">
-                                    <button class="btn btn-outline-primary" type="button">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
+    <!-- Header -->
+        <header class="main-header">
+            <div class="container-fluid">
+                <nav class="navbar navbar-expand-lg navbar-custom">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="/">
+                            <div class="d-flex flex-column">
+                                <span class="brand-title">NewsPortal</span>
+                                <span class="brand-subtitle">Thông tin chính xác - Cập nhật liên tục</span>
                             </div>
-                            <a href="#" class="btn btn-primary" style="border-radius: 8px; padding: 0.5rem 1.5rem;">
-                                <i class="fas fa-rss me-1"></i> Subscribe
-                            </a>
+                        </a>
+                        
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                            <i class="fas fa-bars"></i>
+                        </button>
+
+                        <div class="collapse navbar-collapse" id="navbarMain">
+                            <ul class="navbar-nav mx-auto">
+                                <!-- Trang chủ -->
+                                <li class="nav-item">
+                                    <a class="nav-link-custom {{ Request::is('/') ? 'active' : '' }}" href="/">
+                                        <i class="fas fa-home"></i>
+                                        <span>Trang chủ</span>
+                                    </a>
+                                </li>
+                                
+                                <!-- Các loại tin từ database -->
+                                <?php
+                                use Illuminate\Support\Facades\DB;
+                                $loaitin_arr = DB::table('loaitin')->select('id', 'ten')
+                                    ->orderby('thuTu', 'asc')
+                                    ->where('AnHien', '=', '1')
+                                    ->limit(5)->get();
+                                ?>
+                                
+                                @foreach ($loaitin_arr as $lt)
+                                <li class="nav-item">
+                                    <a class="nav-link-custom {{ Request::is('cat/'.$lt->id) ? 'active' : '' }}" 
+                                    href="{{ url('/cat',[$lt->id]) }}">
+                                        <i class="fas fa-newspaper"></i>
+                                        <span>{{ $lt->ten }}</span>
+                                    </a>
+                                </li>    
+                                @endforeach
+                                
+                                <!-- Dropdown cho các danh mục khác -->
+                                @if(DB::table('loaitin')->where('AnHien', '=', '1')->count() > 5)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link-custom dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                        <span>Khác</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-custom">
+                                        <?php
+                                        $moreCategories = DB::table('loaitin')->select('id', 'ten')
+                                            ->orderby('thuTu', 'asc')
+                                            ->where('AnHien', '=', '1')
+                                            ->skip(5)->take(10)->get();
+                                        ?>
+                                        
+                                        @foreach($moreCategories as $cat)
+                                        <li>
+                                            <a class="dropdown-item dropdown-item-custom" href="{{ url('/cat',[$cat->id]) }}">
+                                                <i class="fas fa-arrow-right text-primary"></i>
+                                                <span>{{ $cat->ten }}</span>
+                                            </a>
+                                        </li>
+                                        @endforeach
+                                    </ul>
+                                </li>
+                                @endif
+                            </ul>
+                            
+                            <!-- Phần tìm kiếm và Subscribe -->
+                            <div class="d-flex align-items-center ms-auto">
+                                <div class="search-box me-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control search-input" placeholder="Tìm kiếm">
+                                        <button class="btn search-btn" type="button">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn subscribe-btn">
+                                    <i class="fas fa-bell"></i>
+                                    <span>Subscribe</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </nav>
-        </div>
-    </header>
+                </nav>
+            </div>
+        </header>
+
+        <style>
+        /* Menu Styles */
+        .nav-link-custom {
+            font-weight: 500;
+            color: #374151 !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin: 0 0.125rem;
+            border: 1px solid transparent;
+            white-space: nowrap;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 40px;
+        }
+
+        .nav-link-custom:hover, .nav-link-custom.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            border-color: #2563eb;
+        }
+
+        .nav-link-custom.active {
+            font-weight: 600;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu-custom {
+            border-radius: 12px !important;
+            border: 1px solid #e5e7eb !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+            margin-top: 0.5rem !important;
+            padding: 0.5rem;
+            min-width: 200px;
+        }
+
+        .dropdown-item-custom {
+            padding: 0.75rem 1rem !important;
+            border-radius: 8px !important;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin: 0.125rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #374151 !important;
+        }
+
+        .dropdown-item-custom:hover {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb) !important;
+            color: #1d4ed8 !important;
+            transform: translateX(4px);
+        }
+
+        /* Search Bar */
+        .search-box {
+            max-width: 280px;
+            min-width: 200px;
+        }
+
+        .search-input {
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            padding-right: 3rem;
+        }
+
+        .search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-btn {
+            border-radius: 50px !important;
+            padding: 0.6rem 1.25rem;
+            border: none;
+            background: #3b82f6;
+            color: white;
+            transition: all 0.3s ease;
+            position: absolute;
+            right: 0;
+            height: calc(100% - 4px);
+            margin: 2px;
+        }
+
+        .search-btn:hover {
+            background: #2563eb;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        /* Subscribe Button */
+        .subscribe-btn {
+            border-radius: 8px !important;
+            padding: 0.6rem 1.5rem !important;
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            border: none !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white !important;
+        }
+
+        .subscribe-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+            background: linear-gradient(135deg, #059669, #047857) !important;
+            color: white !important;
+        }
+
+        /* Responsive fixes */
+        @media (max-width: 992px) {
+            .navbar-nav {
+                padding: 1rem 0;
+                text-align: center;
+            }
+            
+            .nav-item {
+                margin: 0.25rem 0;
+                width: 100%;
+            }
+            
+            .nav-link-custom {
+                justify-content: center;
+                margin: 0.125rem 0;
+            }
+            
+            .search-box {
+                max-width: 100%;
+                margin: 1rem 0;
+            }
+            
+            .subscribe-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        </style>
 
     <!-- Main Content -->
     <main class="main-content">
